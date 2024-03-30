@@ -1,0 +1,12 @@
+# systemctl edit radioless-oled-display to edit:
+# Environment=LUMA_DEVICE=
+# Environment=ASTERISK_PASSWORD=
+# Environment=ASL_CALLSIGN=
+# Environment=ASL_NODE=
+
+[Service]
+ExecStart=/usr/bin/python3 -m radioless_oled_display
+Restart=always
+
+[Install]
+WantedBy=multi-user.target
