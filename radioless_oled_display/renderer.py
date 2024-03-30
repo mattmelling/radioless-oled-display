@@ -56,7 +56,7 @@ class TimeAnimation(TextAnimation):
 
 class DateAnimation(RightAlignedTextAnimation):
     def __init__(self, font, at):
-        RightAlignedTextAnimation.__init__(self, ' ' * 8, font, at)
+        RightAlignedTextAnimation.__init__(self, ' ' * 10, font, at)
 
     def render(self, draw):
         self._text = datetime.now().strftime('%Y-%m-%d')
