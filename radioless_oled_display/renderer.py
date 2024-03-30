@@ -16,7 +16,8 @@ class TextScrollAnimation:
             self._x = draw.im.size[0]
 
         draw.text((self._at[0] + self._x, self._at[1]), self._text, font=self._font, fill='white')
-        self._x -= 1
+
+        self._x -= 2
 
     @property
     def text(self):
@@ -85,12 +86,15 @@ class Renderer:
         for key, renderer in self._renderers.items():
             renderer.render(draw)
 
-    def set_info_text(self, text):
+    def set_info_text(self, text, scroll=False):
         if text is None:
             self.remove_renderer('info_text')
         elif 'info_text' not in self._renderers or self._renderers['info_text'].text != text:
             font = self._fonts['Terminus', 12]
-            self.add_renderer('info_text', TextScrollAnimation(text, font, (2, 37)))
+            if scroll:
+                self.add_renderer('info_text', TextScrollAnimation(text, font, (2, 37)))
+            else:
+                self.add_renderer('info_text', TextAnimation(text, font, (2, 37)))
 
     def set_calling_node(self, text):
         if text is not None:

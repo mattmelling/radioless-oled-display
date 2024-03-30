@@ -12,6 +12,7 @@ class AsteriskManager:
         self._rxnode = None
         self._links = set()
         self._numlinks = 0
+        self._numalinks = 0
         self._manager = pystrix.ami.Manager()
 
     def start(self):
@@ -25,6 +26,7 @@ class AsteriskManager:
         self._manager.register_callback('RPT_RXKEYED', self.handle_rxkeyed)
         self._manager.register_callback('RPT_ALINKS', self.handle_alinks)
         self._manager.register_callback('RPT_NUMLINKS', self.handle_numlinks)
+        self._manager.register_callback('RPT_NUMALINKS', self.handle_numalinks)
         self._manager.monitor_connection()
 
     def handle_txkeyed(self, event, manager):
@@ -44,6 +46,9 @@ class AsteriskManager:
     def handle_numlinks(self, event, manager):
         self._numlinks = int(event['EventValue'])
 
+    def handle_numalinks(self, event, manager):
+        self._numalinks = int(event['EventValue'])
+
     @property
     def rx(self):
         return self._rx
@@ -59,3 +64,7 @@ class AsteriskManager:
     @property
     def numlinks(self):
         return self._numlinks
+
+    @property
+    def numalinks(self):
+        return self._numalinks

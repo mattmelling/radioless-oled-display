@@ -1,5 +1,6 @@
 import os
 import time
+import socket
 
 from luma.core.render import canvas
 from luma.core.interface.serial import i2c
@@ -16,6 +17,11 @@ def get_device():
 
     from luma.emulator.device import pygame
     return pygame(width=128, height=64)
+
+def get_ip():
+    s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+    s.connect(('8.8.8.8', 80))
+    return s.getsockname()[0]
 
 def main():
     print('Connecting to Asterisk')
@@ -34,22 +40,25 @@ def main():
     renderer = Renderer()
     renderer.set_callsign(f'{os.environ.get("ASL_CALLSIGN", "")} {os.environ.get("ASL_NODE", "")}')
 
+    ip = get_ip()
+
     while True:
         with canvas(device) as draw:
 
             if ast.rxnode is not None:
+                renderer.set_calling_node(ast.rxnode)
                 node = astdb[ast.rxnode]
                 if node is not None:
                     callsign, frequency, location = node
-                    renderer.set_info_text(f'{callsign} - {location}')
+                    renderer.set_info_text(f'{callsign} - {location}', scroll=True)
                 else:
                     renderer.set_info_text(None)
             else:
-                renderer.set_info_text(None)
+                renderer.set_info_text(f'IP: {ip} | Nodes: {ast.numlinks} | Local: {ast.numalinks}', scroll=True)
+                renderer.set_calling_node(None)
 
             renderer.set_tx(ast.tx)
             renderer.set_rx(ast.rx)
-            renderer.set_calling_node(ast.rxnode)
 
             renderer.render(draw)
             time.sleep(0.1)
