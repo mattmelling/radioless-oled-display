@@ -25,7 +25,6 @@ class AsteriskManager:
         self._manager.register_callback('RPT_RXKEYED', self.handle_rxkeyed)
         self._manager.register_callback('RPT_ALINKS', self.handle_alinks)
         self._manager.register_callback('RPT_NUMLINKS', self.handle_numlinks)
-        self._manager.register_callback('', self.handle_all)
         self._manager.monitor_connection()
 
     def handle_txkeyed(self, event, manager):
@@ -44,9 +43,6 @@ class AsteriskManager:
 
     def handle_numlinks(self, event, manager):
         self._numlinks = int(event['EventValue'])
-
-    def handle_all(self, event, manager):
-        print(event)
 
     @property
     def rx(self):
