@@ -1,12 +1,14 @@
 import os
 import random
+import itertools
+import math
+
+from datetime import datetime
 
 try:
     import importlib_resources as resources
 except ModuleNotFoundError:
     import importlib.resources as resources
-
-from datetime import datetime
 
 from PIL import Image
 
@@ -14,17 +16,44 @@ from . import images
 from .screen import Screen
 from .text import Text
 
+logos = [
+    'logo.png',
+    'pi.png',
+    'linside.png'
+]
+
 class ScreenSaver(Screen):
     def __init__(self):
         Screen.__init__(self)
+        self.reset()
+
+    def select_screen(self):
         self._screen = random.choice([
             TimeScreenSaver,
             CallsignScreenSaver,
-            LogoScreenSaver
+            LogoScreenSaver,
+            RotatingImageScreenSaver,
+            ClockScreenSaver
         ])()
 
+    def reset(self):
+        self._start = datetime.now()
+        self.select_screen()
+
+    def update(self):
+        Screen.update(self)
+        d = datetime.now() - self._start
+
+        if d.seconds == 0:
+            return
+
+        if d.seconds > 120:
+            self.reset()
+
     def render(self, draw):
-        self._screen.render(draw)
+        Screen.render(self, draw)
+        if self._screen is not None:
+            self._screen.render(draw)
 
 class BouncingTextScreenSaver(Screen):
     def __init__(self, text):
@@ -65,36 +94,78 @@ class CallsignScreenSaver(BouncingTextScreenSaver):
 class LogoScreenSaver(Screen):
     def __init__(self):
         Screen.__init__(self)
-        img = (resources.files(images) / 'logo.png')
-        with img.open('rb') as f:
-            image = Image.open(f)
-            pixels = set()
-            for x in range(image.width):
-                for y in range(image.height):
-                    r, g, b, a = image.getpixel((x, y))
-                    if a > 100:
-                        pixels.add((x, y))
+        self._img = Image.open(resources.files(images) / random.choice(logos))
+        self._x = 0
 
-        self.drawn = set()
-        self.undrawn = pixels
-
-        self.mode = 'draw'
+    def draw(self, draw, d):
+        size = self._img.size
+        for x, y in itertools.product(range(size[0]), range(size[1])):
+            pixel = self._img.getpixel((x, y))
+            if pixel[3] > 150:
+                draw.point((d + x + self._x, y), fill='white')
 
     def render(self, draw):
-        if self.mode == 'draw':
-            pixel = random.choice(list(self.undrawn))
-            self.undrawn.remove(pixel)
-            self.drawn.add(pixel)
+        self.draw(draw, 0)
+        self.draw(draw, draw.im.size[0])
 
-            if len(self.undrawn) == 0:
-                self.mode = 'undraw'
-        else:
-            pixel = random.choice(list(self.drawn))
-            self.drawn.remove(pixel)
-            self.undrawn.add(pixel)
+        self._x -= 3
+        if self._x < -draw.im.size[0]:
+            self._x = draw.im.size[0] + 1
 
-            if len(self.drawn) == 0:
-                self.mode = 'draw'
+class RotatingImageScreenSaver(Screen):
+    def __init__(self):
+        Screen.__init__(self)
+        self._t = 0
+        self._img = Image.open(resources.files(images) / random.choice(logos))
 
-        for x, y in self.drawn:
-            draw.point([(x, y)], fill='white')
+    def render(self, draw):
+        size = self._img.size
+        img = self._img.rotate(self._t, resample=Image.BILINEAR)
+        for x, y in itertools.product(range(size[0]), range(size[1])):
+            pixel = img.getpixel((x, y))
+            if pixel[3] > 150:
+                draw.point((x, y), fill='white')
+        self._t += 1
+
+class ClockScreenSaver(Screen):
+    """
+    From luma-examples
+    """
+
+    def __init__(self):
+        Screen.__init__(self)
+
+    def posn(self, angle, arm_length):
+        dx = int(math.cos(math.radians(angle)) * arm_length)
+        dy = int(math.sin(math.radians(angle)) * arm_length)
+        return dx, dy
+
+    def render(self, draw):
+        now = datetime.now()
+        today_date = now.strftime("%d %b %y")
+        today_time = now.strftime("%H:%M:%S")
+
+        margin = 4
+
+        cx = 30
+        cy = draw.im.size[1] / 2
+
+        left = cx - cy
+        right = cx + cy
+
+        hrs_angle = 270 + (30 * (now.hour + (now.minute / 60.0)))
+        hrs = self.posn(hrs_angle, cy - margin - 7)
+
+        min_angle = 270 + (6 * now.minute)
+        mins = self.posn(min_angle, cy - margin - 2)
+
+        sec_angle = 270 + (6 * now.second)
+        secs = self.posn(sec_angle, cy - margin - 2)
+
+        draw.ellipse((left + margin, margin, right - margin, draw.im.size[1] - margin), outline="white")
+        draw.line((cx, cy, cx + hrs[0], cy + hrs[1]), fill="white")
+        draw.line((cx, cy, cx + mins[0], cy + mins[1]), fill="white")
+        draw.line((cx, cy, cx + secs[0], cy + secs[1]), fill="red")
+        draw.ellipse((cx - 2, cy - 2, cx + 2, cy + 2), fill="white", outline="white")
+        draw.text((2 * (cx + margin), cy - 8), today_date, fill="yellow")
+        draw.text((2 * (cx + margin), cy + 2), today_time, fill="yellow")
