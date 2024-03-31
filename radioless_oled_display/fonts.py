@@ -14,7 +14,6 @@ class FontManager:
 
     def find(self, name):
         path = subprocess.check_output(['fc-match', '-f', '%{file}', name])
-        print(path)
         return path.decode('utf-8')
 
     def get_font(self, name, size):

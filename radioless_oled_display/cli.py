@@ -1,14 +1,17 @@
 import os
 import time
-import socket
+
+from datetime import datetime
 
 from luma.core.render import canvas
 from luma.core.interface.serial import i2c
 from luma.oled.device import ssd1306
 
 from .asterisk import AsteriskManager
-from .renderer import Renderer
 from .astdb import AllstarDatabase
+from .qso import RxScreen, TxScreen
+from .idle import IdleScreen, NoConnectionScreen
+from .screensaver import ScreenSaver
 
 def get_device():
     if os.environ.get('LUMA_DEVICE', 'pygame') == 'ssd1306':
@@ -17,11 +20,6 @@ def get_device():
 
     from luma.emulator.device import pygame
     return pygame(width=128, height=64)
-
-def get_ip():
-    s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-    s.connect(('8.8.8.8', 80))
-    return s.getsockname()[0]
 
 def main():
     print('Connecting to Asterisk')
@@ -37,28 +35,49 @@ def main():
     device.show()
 
     print('Starting render loop')
-    renderer = Renderer()
-    renderer.set_callsign(f'{os.environ.get("ASL_CALLSIGN", "")} {os.environ.get("ASL_NODE", "")}')
 
-    ip = get_ip()
+    tx = None
+    rx = None
+    idle = IdleScreen(ast)
+    nocon = NoConnectionScreen(ast)
+    screensaver = None
+
+    last_activity = datetime.now()
+    screensaver_timeout = 60
 
     while True:
         with canvas(device) as draw:
-
-            if ast.rxnode is not None:
-                renderer.set_calling_node(ast.rxnode)
-                node = astdb[ast.rxnode]
-                if node is not None:
-                    callsign, frequency, location = node
-                    renderer.set_info_text(f'{callsign} - {location}', scroll=True)
-                else:
-                    renderer.set_info_text(None)
+            since_last = (datetime.now() - last_activity).seconds
+            if ast.tx:
+                if tx is None:
+                    tx = TxScreen(ast)
+                tx.render(draw)
+                last_activity = datetime.now()
+                continue
             else:
-                renderer.set_info_text(f'IP: {ip} | Nodes: {ast.numlinks} | Local: {ast.numalinks}', scroll=True)
-                renderer.set_calling_node(None)
+                tx = None
 
-            renderer.set_tx(ast.tx)
-            renderer.set_rx(ast.rx)
+            if ast.rx:
+                if rx is None:
+                    rx = RxScreen(ast, astdb)
+                rx.render(draw)
+                last_activity = datetime.now()
+                continue
+            else:
+                rx = None
 
-            renderer.render(draw)
+            if since_last > screensaver_timeout and screensaver is None:
+                screensaver = ScreenSaver()
+            elif since_last < screensaver_timeout:
+                screensaver = None
+
+            if screensaver is not None:
+                screensaver.render(draw)
+                continue
+
+            if ast.numlinks > 0:
+                idle.render(draw)
+            else:
+                nocon.render(draw)
+
             time.sleep(0.1)
