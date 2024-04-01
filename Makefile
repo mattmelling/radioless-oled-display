@@ -4,3 +4,4 @@ install:
 	pip3 install .
 	cp radioless-oled-display.service /etc/systemd/system/
 	systemctl enable radioless-oled-display.service
+	systemctl daemon-reload
