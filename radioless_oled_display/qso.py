@@ -21,7 +21,7 @@ class RxScreen(QsoScreen):
             node = self.astdb[self.ast.rxnode]
             if node is not None:
                 callsign, frequency, location = node
-                txt = f'{callsign} - {location}'
+                txt = f'{callsign} - {location} | '
                 if not self.has_renderer('rx_scroll') or self._renderers['rx_scroll'].text != txt:
                     self.add_renderer('rx_scroll', ScrollText(txt, self.fonts['Terminus', 12], (2, 37)))
         else:

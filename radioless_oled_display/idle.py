@@ -14,7 +14,7 @@ class IdleScreen(QsoScreen):
 
     def update(self):
         QsoScreen.update(self)
-        text = f'{get_ip()} | Nodes: {self.ast.numlinks} | Local: {self.ast.numalinks}'
+        text = f'{get_ip()} | Nodes: {self.ast.numlinks} | Local: {self.ast.numalinks} | '
 
         if not self.has_renderer('info_text') or self._renderers['info_text'].text != text:
             self.add_renderer('info_text', ScrollText(text, self.fonts['Terminus', 12], (2, 40)))

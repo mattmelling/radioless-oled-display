@@ -24,23 +24,27 @@ class RightAlignedText(Renderable):
     def render(self, draw):
         draw.text((draw.im.size[0] - self._at[0], self._at[1]), self._text, font=self._font, fill='white')
 
-class ScrollText:
+class ScrollText(Renderable):
     def __init__(self, text, font, at):
         self._text = text
         self._font = font
         self._x = 0
         self._at = at
-
-        x, y, lx, ly = font.getbbox(text)
+        x, y, lx, ly = font.getbbox(self._text)
         self._lx = lx
 
     def render(self, draw):
-        if self._x + self._lx < 0:
-            self._x = draw.im.size[0]
+        offset = self._x + self._lx
+
+        if offset < 0:
+            self._x = offset
+            offset = self._x + self._lx
 
         draw.text((self._at[0] + self._x, self._at[1]), self._text, font=self._font, fill='white')
+        draw.text((self._at[0] + offset, self._at[1]), self._text, font=self._font, fill='white')
 
         self._x -= 2
+        print(self._x, offset)
 
     @property
     def text(self):
