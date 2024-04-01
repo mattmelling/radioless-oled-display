@@ -102,15 +102,15 @@ class LogoScreenSaver(Screen):
         for x, y in itertools.product(range(size[0]), range(size[1])):
             pixel = self._img.getpixel((x, y))
             if pixel[3] > 150:
-                draw.point((d + x + self._x, y), fill='white')
+                draw.point((d + x, y), fill='white')
 
     def render(self, draw):
-        self.draw(draw, 0)
-        self.draw(draw, draw.im.size[0])
-
-        self._x -= 3
-        if self._x < -draw.im.size[0]:
-            self._x = draw.im.size[0] + 1
+        offset = draw.im.size[0]
+        if self._x < -offset:
+            self._x = 0
+        self.draw(draw, self._x)
+        self.draw(draw, self._x + offset)
+        self._x -= 1
 
 class RotatingImageScreenSaver(Screen):
     def __init__(self):

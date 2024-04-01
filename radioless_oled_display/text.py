@@ -44,7 +44,6 @@ class ScrollText(Renderable):
         draw.text((self._at[0] + offset, self._at[1]), self._text, font=self._font, fill='white')
 
         self._x -= 2
-        print(self._x, offset)
 
     @property
     def text(self):
