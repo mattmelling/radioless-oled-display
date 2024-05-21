@@ -1,0 +1,42 @@
+[[https://allstarlink.org][Allstar]] node status screen using SSD1306 OLED display module.
+
+TX timer:
+
+[[./img/tx.png]]
+
+Idle screen (no link):
+
+[[./img/nolink.png]]
+
+One of the screensavers:
+
+[[./img/screensaver-1.png]]
+
+Originally written for use on a Raspberry Pi Model 3b with the display connected over I2C, running the Allstarlink software. As the display is accessed using the ~luma.oled~, this could be changed to another display type. The ~pygame~ device is useful for local testing.
+
+This all ended up in a box with the Pi, a speaker, and an interface to the radio mic:
+
+[[./img/node.jpg]]
+
+** Installing
+#+BEGIN_SRC
+sudo make install
+sudo systemctl edit radioless-oled-display.service
+#+END_SRC
+
+In the editor window, set the following environment variables:
+
+#+BEGIN_SRC
+[Service]
+Environment=LUMA_DEVICE="pygame" or "ssd1306"
+Environment=ASTERISK_PASSWORD="asterisk manager password"
+Environment=ASL_CALLSIGN="node callsign"
+Environment=ASL_NODE="node number"
+#+END_SRC
+
+Then
+
+#+BEGIN_SRC
+sudo systemctl daemon-reload
+sudo systemctl restart radioless-oled-display.service
+#+END_SRC
