@@ -18,7 +18,24 @@ This all ended up in a box with the Pi, a speaker, and an interface to the radio
 
 [[./img/node.jpg]]
 
-** Installing
+** Hardware Setup
+The SSD1306 module has 4 pins labelled GND, VCC, SCL, SDA. Each of these should be connected directly to a pin on the Pi's GPIO header.
+
+See [[https://pinout.xyz/][pinout.xyx]] for the exact numbering scheme and exact locations of pins. Connections should be made as follows:
+
+|---------+--------------------------------------------------|
+| SSD1306 | Raspberry Pi                                     |
+|---------+--------------------------------------------------|
+| GND     | Any ground pin (6, 9, 14, 20, 25, 30, 34, or 39) |
+| VCC     | Any 5v pin (2 or 4)                              |
+| SCL     | Pin 5 - GPIO 3 / I2C1 SCL                        |
+| SDA     | Pin 3 - GPIO 2 / I2C1 SDA                        |
+|---------+--------------------------------------------------|
+
+[[./img/schematic.png]]
+
+** Software Setup
+From within the repository folder (git clone or download and extract ZIP file):
 #+BEGIN_SRC
 sudo make install
 sudo systemctl edit radioless-oled-display.service
@@ -32,6 +49,14 @@ Environment=LUMA_DEVICE="pygame" or "ssd1306"
 Environment=ASTERISK_PASSWORD="asterisk manager password"
 Environment=ASL_CALLSIGN="node callsign"
 Environment=ASL_NODE="node number"
+#+END_SRC
+
+The above assumes that asterisk is running on the same device, if that is not the case you may need to set the following dending on your specific configuration:
+
+#+BEGIN_SRC
+Environment=ASTERISK_HOSTNAME="localhost"
+Environment=ASTERISK_PORT="5038"
+Environment=ASTERISK_USERNAME="admin"
 #+END_SRC
 
 Then
