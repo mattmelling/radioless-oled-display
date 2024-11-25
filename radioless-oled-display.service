@@ -5,11 +5,11 @@
 # Environment=ASL_NODE=
 
 [Service]
-ExecStartPre=sleep 10
+ExecStartPre=sleep 3
 ExecStart=/usr/bin/python3 -m radioless_oled_display
 Restart=always
 
 [Install]
 WantedBy=multi-user.target
-Requires=asterisk.service
-After=asterisk.service
+#Requires=asterisk.service
+#After=asterisk.service
