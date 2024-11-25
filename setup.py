@@ -10,11 +10,12 @@ setup(name='radioless-oled-display',
           'radioless_oled_display': ['images/*.png']
       },
       install_requires=[
-          'luma.core',
+          'luma.core == 2.4.0',
           'luma.emulator',
-          'luma.oled',
+          'luma.oled == 3.12.0',
+          'pyftdi == 0.54.0',
           'pystrix',
-          'importlib_resources'
+          'importlib_resources == 4.1.0'
       ],
       entry_points={
           'console_scripts': [
