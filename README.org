@@ -35,7 +35,13 @@ See [[https://pinout.xyz/][pinout.xyx]] for the exact numbering scheme and exact
 [[./img/schematic.png]]
 
 ** Software Setup
-From within the repository folder (git clone or download and extract ZIP file):
+Download the repository and enter its directory:
+#+BEGIN_SRC
+git clone https://github.com/mattmelling/radioless-oled-display.git
+cd radioless-oled-display
+#+END_SRC
+
+Then to install:
 #+BEGIN_SRC
 sudo make install
 sudo systemctl edit radioless-oled-display.service
@@ -51,7 +57,7 @@ Environment=ASL_CALLSIGN="node callsign"
 Environment=ASL_NODE="node number"
 #+END_SRC
 
-The above assumes that asterisk is running on the same device, if that is not the case you may need to set the following dending on your specific configuration:
+The above assumes that asterisk is running on the same device, if that is not the case you may need to set the following depending on your specific configuration:
 
 #+BEGIN_SRC
 Environment=ASTERISK_HOSTNAME="localhost"
