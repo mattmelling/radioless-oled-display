@@ -34,6 +34,8 @@ See [[https://pinout.xyz/][pinout.xyx]] for the exact numbering scheme and exact
 
 [[./img/schematic.png]]
 
+Finally, enable I2C on the Raspberry Pi with ~sudo raspi-config~ then navigate to "3 Interface Options" => "P5 I2C" => "Yes" to enable ARM I2C interface.
+
 ** Software Setup
 Download the repository and enter its directory:
 #+BEGIN_SRC

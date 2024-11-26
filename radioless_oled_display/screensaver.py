@@ -19,7 +19,8 @@ from .text import Text
 logos = [
     'logo.png',
     'pi.png',
-    'linside.png'
+    'linside.png',
+    'asterisk.png'
 ]
 
 class ScreenSaver(Screen):
