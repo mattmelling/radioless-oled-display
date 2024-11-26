@@ -1,8 +1,11 @@
 import pystrix
+import logging
 
+logger = logging.getLogger('AsteriskManager')
 
 class AsteriskManager:
-    def __init__(self, hostname='localhost', port=5038, username='admin', password='password'):
+    def __init__(self, hostname='localhost', port=5038, username='admin', password='password', node=None):
+        self._node = node
         self._hostname = hostname
         self._port = port
         self._username = username
@@ -22,7 +25,6 @@ class AsteriskManager:
                                               challenge=challenge_response.result['Challenge'])
         self._manager.send_action(login_action)
         self._manager.register_callback('RPT_TXKEYED', self.handle_txkeyed)
-        self._manager.register_callback('RPT_ETXKEYED', self.handle_etxkeyed)
         self._manager.register_callback('RPT_RXKEYED', self.handle_rxkeyed)
         self._manager.register_callback('RPT_ALINKS', self.handle_alinks)
         self._manager.register_callback('RPT_NUMLINKS', self.handle_numlinks)
@@ -30,23 +32,48 @@ class AsteriskManager:
         self._manager.monitor_connection()
 
     def handle_txkeyed(self, event, manager):
-        self._rx = event['EventValue'] == '1'
-        if not self._rx:
-            self._rxnode = None
-
-    def handle_etxkeyed(self, event, manager):
-        self._rx = False
+        if event['Node'] != self._node:
+            return
+        logger.debug(event)
+        self._tx = int(event['EventValue']) == 1
 
     def handle_rxkeyed(self, event, manager):
-        self._tx = event['EventValue'] == '1'
+        if event['Node'] != self._node:
+            return
+        logger.debug(event)
+        self._rx = int(event['EventValue']) == 1
 
     def handle_alinks(self, event, manager):
-        self._rxnode = event['EventValue'].split(',')[1][:-2]
+        if event['Node'] != self._node:
+            return
+        logger.debug(event)
+
+        nodes = event['EventValue'].split(',')[1:]
+        if len(nodes) == 0:
+            return
+
+        rx = None
+        for node in nodes:
+            nn = node[:-2]
+            key = node[-1]
+            if key == 'K':
+                rx = nn
+
+        self._tx = rx is not None
+        if self._tx:
+            self._rx = False
+        self._rxnode = rx
 
     def handle_numlinks(self, event, manager):
+        if event['Node'] != self._node:
+            return
+        logger.debug(event)
         self._numlinks = int(event['EventValue'])
 
     def handle_numalinks(self, event, manager):
+        if event['Node'] != self._node:
+            return
+        logger.debug(event)
         self._numalinks = int(event['EventValue'])
 
     @property

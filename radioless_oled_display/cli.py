@@ -26,7 +26,8 @@ def main():
     ast = AsteriskManager(hostname=os.environ.get('ASTERISK_HOSTNAME', 'localhost'),
                           port=int(os.environ.get('ASTERISK_PORT', '5038')),
                           username=os.environ.get('ASTERISK_USERNAME', 'admin'),
-                          password=os.environ.get('ASTERISK_PASSWORD', 'password'))
+                          password=os.environ.get('ASTERISK_PASSWORD', 'password'),
+                          node=os.environ.get('ASL_NODE', 'password'))
     ast.start()
     astdb = AllstarDatabase(os.environ.get('ASTDB', '/var/log/asterisk/astdb.txt'))
 
@@ -50,7 +51,7 @@ def main():
             since_last = (datetime.now() - last_activity).seconds
             if ast.tx:
                 if tx is None:
-                    tx = TxScreen(ast)
+                    tx = TxScreen(ast, astdb)
                 tx.render(draw)
                 last_activity = datetime.now()
                 continue
@@ -59,7 +60,7 @@ def main():
 
             if ast.rx:
                 if rx is None:
-                    rx = RxScreen(ast, astdb)
+                    rx = RxScreen(ast)
                 rx.render(draw)
                 last_activity = datetime.now()
                 continue

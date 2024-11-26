@@ -8,7 +8,7 @@ class QsoScreen(StatusScreen):
     def __init__(self, ast):
         StatusScreen.__init__(self, ast)
 
-class RxScreen(QsoScreen):
+class TxScreen(QsoScreen):
     def __init__(self, ast, astdb):
         QsoScreen.__init__(self, ast)
         self.astdb = astdb
@@ -22,14 +22,14 @@ class RxScreen(QsoScreen):
             if node is not None:
                 callsign, frequency, location = node
                 txt = f'{callsign} - {location} | '
-                if not self.has_renderer('rx_scroll') or self._renderers['rx_scroll'].text != txt:
-                    self.add_renderer('rx_scroll', ScrollText(txt, self.fonts['Terminus', 12], (2, 37)))
+                if not self.has_renderer('rxnode_scroll') or self._renderers['rxnode_scroll'].text != txt:
+                    self.add_renderer('rxnode_scroll', ScrollText(txt, self.fonts['Terminus', 12], (2, 37)))
         else:
             self.remove_renderer('calling_node')
-            self.remove_renderer('rx_scroll')
+            self.remove_renderer('rxnode_scroll')
 
 
-class TxScreen(QsoScreen):
+class RxScreen(QsoScreen):
     def __init__(self, ast):
         QsoScreen.__init__(self, ast)
         self._start = datetime.now()
