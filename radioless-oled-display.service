@@ -5,6 +5,7 @@
 # Environment=ASL_NODE=
 
 [Service]
+WorkingDirectory=/opt/radioless-oled-display
 ExecStartPre=sleep 3
 ExecStart=/usr/bin/python3 -m radioless_oled_display
 Restart=always

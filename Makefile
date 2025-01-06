@@ -1,7 +1,8 @@
 .PHONY: install
 install:
-	apt-get install -y python3-setuptools libopenjp2-7 xfonts-terminus fonts-dejavu python3-pygame
-	pip3 install .
+	mkdir -p /opt/radioless-oled-display
+	pip3 install --target /opt/radioless-oled-display .
 	cp radioless-oled-display.service /etc/systemd/system/
 	systemctl enable radioless-oled-display.service
 	systemctl daemon-reload
+	systemctl restart radioless-oled-display

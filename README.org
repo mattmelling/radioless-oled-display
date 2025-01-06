@@ -37,6 +37,12 @@ See [[https://pinout.xyz/][pinout.xyx]] for the exact numbering scheme and exact
 Finally, enable I2C on the Raspberry Pi with ~sudo raspi-config~ then navigate to "3 Interface Options" => "P5 I2C" => "Yes" to enable ARM I2C interface.
 
 ** Software Setup
+First install some dependencies. This command will work with Debian 12 (ASL3), you may need to do something different for other distributions:
+
+#+BEGIN_SRC
+sudo apt-get install -y make python3-pip xfonts-terminus fonts-dejavu libopenjp2-7 libsdl2-dev
+#+END_SRC
+
 Download the repository and enter its directory:
 #+BEGIN_SRC
 git clone https://github.com/mattmelling/radioless-oled-display.git
