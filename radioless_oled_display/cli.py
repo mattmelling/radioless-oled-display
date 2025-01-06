@@ -5,7 +5,7 @@ from datetime import datetime
 
 from luma.core.render import canvas
 from luma.core.interface.serial import i2c
-from luma.oled.device import ssd1306
+from luma.oled.device import ssd1306, sh1106
 
 from .asterisk import AsteriskManager
 from .astdb import AllstarDatabase
@@ -14,9 +14,15 @@ from .idle import IdleScreen, NoConnectionScreen
 from .screensaver import ScreenSaver
 
 def get_device():
+    addr = int(os.environ.get('LUMA_I2C_ADDRESS', '0x3c'), 16)
+
     if os.environ.get('LUMA_DEVICE', 'pygame') == 'ssd1306':
-        serial = i2c(port=1, address=0x3c)
+        serial = i2c(port=1, address=addr)
         return ssd1306(serial_interface=serial, width=128, height=64)
+
+    if os.environ.get('LUMA_DEVICE', 'pygame') == 'sh1106':
+        serial = i2c(port=1, address=addr)
+        return sh1106(serial_interface=serial, width=128, height=64)
 
     from luma.emulator.device import pygame
     return pygame(width=128, height=64)

@@ -59,7 +59,8 @@ In the editor window, set the following environment variables:
 
 #+BEGIN_SRC
 [Service]
-Environment=LUMA_DEVICE="pygame" or "ssd1306"
+Environment=LUMA_DEVICE="pygame" or "ssd1306" or "sh1106"
+Environment=LUMA_I2C_ADDRESS="0x3c"
 Environment=ASTERISK_PASSWORD="asterisk manager password"
 Environment=ASL_CALLSIGN="node callsign"
 Environment=ASL_NODE="node number"
