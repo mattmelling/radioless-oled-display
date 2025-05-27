@@ -74,6 +74,15 @@ Environment=ASTERISK_PORT="5038"
 Environment=ASTERISK_USERNAME="admin"
 #+END_SRC
 
+Install the nodelist updater (provides ~astdb.txt~ for callsign lookups):
+
+#+BEGIN_SRC
+sudo apt-get install asl3-update-nodelist
+sudo systemctl enable asl3-update-astdb.service
+sudo systemctl enable asl3-update-astdb.timer
+sudo systemctl start asl3-update-astdb.timer
+#+END_SRC
+
 Then
 
 #+BEGIN_SRC
